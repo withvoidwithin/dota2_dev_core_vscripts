@@ -1,2 +1,2 @@
 # dota2_dev_utils
-My custom utility functions for convenient project development.
+My custom VScripts utility functions for Dota 2 custom game development.
