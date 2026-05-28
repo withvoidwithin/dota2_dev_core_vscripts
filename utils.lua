@@ -4,6 +4,9 @@
 ----               https://withvoidwithin.github.io/
 ---- ════════════════════════════════════════════════════════════════
 
+--- @class _Utils
+local Utils = {}
+
 ---- Numbers
 ---- ================================================================================================================================
 
@@ -16,7 +19,7 @@
 --- @param max? number Optional upper bound
 --- @return number
 --- **[ Server / Client ]**
-function _Clamp(number, min, max)
+function Utils:Clamp(number, min, max)
     if min and number < min then return min end
     if max and number > max then return max end
     return number
@@ -32,7 +35,7 @@ end
 --- @param inverted? boolean Whether to invert into a V-shaped distribution (default: false)
 --- @return number
 --- **[ Server / Client ]**
-function _RandomDist(min, max, bias, inverted)
+function Utils:RandomDist(min, max, bias, inverted)
     bias = _Clamp(bias or 0.5, 0.001, 0.999)
 
     local u = RandomFloat(0, 1)
@@ -64,7 +67,7 @@ end
 --- @param should_clamp? boolean Whether to clamp the input to [in_min, in_max] (default: false)
 --- @return number
 --- **[ Server / Client ]**
-function _Remap(number, in_min, in_max, out_min, out_max, should_clamp)
+function Utils:Remap(number, in_min, in_max, out_min, out_max, should_clamp)
     if should_clamp then
         number = _Clamp(number, in_min, in_max)
     end
@@ -78,7 +81,7 @@ end
 --- @param decimals? number Number of decimal places (default: 0)
 --- @return number
 --- **[ Server / Client ]**
-function _Round(number, decimals)
+function Utils:Round(number, decimals)
     local factor = 10 ^ (decimals or 0)
     return math.floor(number * factor + 0.5) / factor
 end
@@ -92,7 +95,7 @@ end
 --- @param sep? string Separator pattern (default: " ")
 --- @return table
 --- **[ Server / Client ]**
-function _SplitString(str, sep)
+function Utils:SplitString(str, sep)
     sep = sep or " "
     local result = {}
     for part in str:gmatch("([^" .. sep .. "]+)") do
@@ -109,7 +112,7 @@ end
 --- @param half_size number Half-size of the square
 --- @return Vector
 --- **[ Server / Client ]**
-function _GetRandomPointInSquare(center, half_size)
+function Utils:GetRandomPointInSquare(center, half_size)
     return Vector(
         center.x + RandomFloat(-half_size, half_size),
         center.y + RandomFloat(-half_size, half_size),
@@ -123,7 +126,7 @@ end
 --- @param radius number Radius of the circle
 --- @return Vector
 --- **[ Server / Client ]**
-function _GetRandomPointInCircle(center, radius)
+function Utils:GetRandomPointInCircle(center, radius)
     local angle = RandomFloat(0, 2 * math.pi)
     local dist = radius * math.sqrt(RandomFloat(0, 1))
     return Vector(
@@ -141,7 +144,7 @@ end
 --- @param tbl table The table to pick from
 --- @return any
 --- **[ Server / Client ]**
-function _GetTableRandomKey(tbl)
+function Utils:GetTableRandomKey(tbl)
     local keys = {}
     for k in pairs(tbl) do
         keys[#keys + 1] = k
@@ -155,7 +158,7 @@ end
 --- @param tbl table The table to pick from
 --- @return any
 --- **[ Server / Client ]**
-function _GetTableRandomValue(tbl)
+function Utils:GetTableRandomValue(tbl)
     return tbl[_GetTableRandomKey(tbl)]
 end
 
@@ -164,10 +167,12 @@ end
 --- @param tbl table The table to count
 --- @return number
 --- **[ Server / Client ]**
-function _GetTableSize(tbl)
+function Utils:GetTableSize(tbl)
     local count = 0
     for _ in pairs(tbl) do
         count = count + 1
     end
     return count
 end
+
+return Utils
