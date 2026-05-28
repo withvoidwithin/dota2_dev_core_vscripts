@@ -10,14 +10,14 @@
 --- @param context CScriptPrecacheContext The precache context provided by the engine
 --- @param res? _PrecacheTable Table of resource types mapped to lists of file paths
 --- @usage
---- function Precache(context)
----     _Precache(context, {
----         model         = { "models/heroes/antimage/antimage.vmdl" },
----         particle      = { "particles/units/heroes/hero_antimage/antimage_blink.vpcf" },
----         soundfile     = { "soundevents/game_sounds_heroes/game_sounds_antimage.vsndevts" },
----         model_folder  = { "models/heroes/antimage" },
----     })
---- end
+--- ```lua
+--- _Precache(context, {
+---     model         = { "models/heroes/antimage/antimage.vmdl" },
+---     particle      = { "particles/units/heroes/hero_antimage/antimage_blink.vpcf" },
+---     soundfile     = { "soundevents/game_sounds_heroes/game_sounds_antimage.vsndevts" },
+---     model_folder  = { "models/heroes/antimage" },
+--- })
+--- ```
 --- **[ Server ]**
 function _Precache(context, res)
     for type, files in pairs(res or {}) do
