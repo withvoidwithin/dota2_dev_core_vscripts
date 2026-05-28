@@ -4,6 +4,14 @@
 ----               https://withvoidwithin.github.io/
 ---- ════════════════════════════════════════════════════════════════
 
+local path = type(...) == "string" and (...):match("(.-)[^%.]+$") or ""
+
+--- @class _Utils_Server: _Utils
+local UtilsServer = setmetatable({}, { __index = require(path .. "utils") })
+
+---- Main
+---- ================================================================================================================================
+
 --- Precaches a set of resources by type using the provided context.
 --- Iterates over a table of resource types and their associated file paths,
 --- calling PrecacheResource for each entry.
@@ -19,7 +27,7 @@
 --- })
 --- ```
 --- **[ Server ]**
-function _Precache(context, res)
+function UtilsServer:Precache(context, res)
     for type, files in pairs(res or {}) do
         for _, File in pairs(files or {}) do
             PrecacheResource(type, File, context)
@@ -30,11 +38,7 @@ end
 ---- Annotations
 ---- ================================================================================================================================
 
---- @alias _PrecacheType
---- | "model_folder"
---- | "model"
---- | "particle_folder"
---- | "particle"
---- | "soundfile"
+--- @alias _PrecacheType "model_folder" | "model" | "particle_folder" | "particle" | "soundfile"
+--- @alias _PrecacheTable table<_PrecacheType, string[]>
 
---- @alias _PrecacheTable {[_PrecacheType]: table<string>}
+return UtilsServer
