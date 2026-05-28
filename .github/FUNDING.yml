@@ -13,5 +13,4 @@
 # buy_me_a_coffee: # Replace with a single Buy Me a Coffee username
 # thanks_dev: # Replace with a single thanks.dev username
 
-custom:
-  - https://boosty.to/withvoidwithin
+custom: ["https://boosty.to/withvoidwithin"]
