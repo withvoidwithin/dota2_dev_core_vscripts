@@ -36,7 +36,7 @@ end
 --- @return number
 --- **[ Server / Client ]**
 function Utils:RandomDist(min, max, bias, inverted)
-    bias = _Clamp(bias or 0.5, 0.001, 0.999)
+    bias = self:Clamp(bias or 0.5, 0.001, 0.999)
 
     local u = RandomFloat(0, 1)
     local range = max - min
@@ -69,7 +69,7 @@ end
 --- **[ Server / Client ]**
 function Utils:Remap(number, in_min, in_max, out_min, out_max, should_clamp)
     if should_clamp then
-        number = _Clamp(number, in_min, in_max)
+        number = self:Clamp(number, in_min, in_max)
     end
     return out_min + (number - in_min) * (out_max - out_min) / (in_max - in_min)
 end
@@ -159,7 +159,7 @@ end
 --- @return any
 --- **[ Server / Client ]**
 function Utils:GetTableRandomValue(tbl)
-    return tbl[_GetTableRandomKey(tbl)]
+    return tbl[self:GetTableRandomKey(tbl)]
 end
 
 --- Returns the total number of elements in a table, including both array and hash parts.
