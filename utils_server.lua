@@ -27,7 +27,7 @@ local UtilsServer = setmetatable({}, { __index = require(path .. "utils") })
 --- })
 --- ```
 --- **[ Server ]**
-function UtilsServer:Precache(context, res)
+function UtilsServer.Precache(context, res)
     for type, files in pairs(res or {}) do
         for _, File in pairs(files or {}) do
             PrecacheResource(type, File, context)
