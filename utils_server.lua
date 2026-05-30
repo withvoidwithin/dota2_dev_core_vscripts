@@ -35,6 +35,60 @@ function UtilsServer.Precache(context, res)
     end
 end
 
+--- Registers a client game event listener and binds its tracking directly to the given context.
+--- Automatically unregisters any pre-existing listener for the same event name on this context.
+--- @param context table|any The context (table, custom class, or Dota entity) binding this listener
+--- @param event_name string The custom network event name to listen for
+--- @param callback fun(user_id: number, event: table) Callback executed when the event is received
+--- @return number listener_id Returns the registered event listener ID
+--- **[ Server Only ]**
+function UtilsServer.RegisterClientEventListener(context, event_name, callback)
+    context.__utils = context.__utils or {}
+    local utils = context.__utils
+
+    utils.client_event_listeners = utils.client_event_listeners or {}
+    local listeners = utils.client_event_listeners
+
+    if listeners[event_name] then CustomGameEventManager:UnregisterListener(listeners[event_name]) end
+    listeners[event_name] = CustomGameEventManager:RegisterListener(event_name, callback)
+
+    return listeners[event_name]
+end
+
+--- Unregisters client game event listeners bound to the given context.
+--- If `event_name` is omitted, all registered listeners on this context are unregistered.
+--- Cleans up empty internal tracking tables to prevent memory/table pollution.
+--- @param context table|any The context (table, custom class, or Dota entity) the listener is bound to
+--- @param event_name? string Optional. The custom network event name to unregister. If omitted, unregisters all listeners.
+--- **[ Server Only ]**
+function UtilsServer.UnregisterClientEventListener(context, event_name)
+    local utils = context.__utils
+    if not utils then return end
+
+    local listeners = utils.client_event_listeners
+    if not listeners then return end
+
+    if event_name then
+        local id = listeners[event_name]
+        if id then
+            CustomGameEventManager:UnregisterListener(id)
+            listeners[event_name] = nil
+        end
+    else
+        for name, id in pairs(listeners) do
+            CustomGameEventManager:UnregisterListener(id)
+            listeners[name] = nil
+        end
+    end
+
+    if next(listeners) == nil then
+        utils.client_event_listeners = nil
+        if next(utils) == nil then
+            context.__utils = nil
+        end
+    end
+end
+
 ---- Annotations
 ---- ================================================================================================================================
 
