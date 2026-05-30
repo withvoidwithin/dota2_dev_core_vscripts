@@ -139,6 +139,36 @@ end
 ---- Tables
 ---- ================================================================================================================================
 
+--- Recursively creates a deep copy of a table.
+--- Does not clone Dota 2 entities or tables already processed (prevents cyclic loops).
+--- @generic T
+--- @param tbl T The table to copy
+--- @param seen? table Internal lookup table to handle cyclic references (do not pass manually)
+--- @return T
+--- **[ Server / Client ]**
+function Utils.DeepCopy(tbl, seen)
+    if type(tbl) ~= "table" then return tbl end
+    if IsValidEntity(tbl) then return tbl end
+
+    seen = seen or {}
+    if seen[tbl] then return seen[tbl] end
+
+    local copy = {}
+    seen[tbl] = copy
+
+    for k, v in pairs(tbl) do
+        local key = (type(k) == "table") and Utils.DeepCopy(k, seen) or k
+        local value = (type(v) == "table") and Utils.DeepCopy(v, seen) or v
+        copy[key] = value
+    end
+
+    local mt = getmetatable(tbl)
+
+    if mt then setmetatable(copy, mt) end
+
+    return copy
+end
+
 --- Returns a random key from a table, including both array and hash parts.
 --- Returns nil if the table is empty.
 --- @param tbl table The table to pick from
