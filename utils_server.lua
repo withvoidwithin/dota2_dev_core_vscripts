@@ -4,7 +4,8 @@
 ----               https://withvoidwithin.github.io/
 ---- ════════════════════════════════════════════════════════════════
 
-local path = type(...) == "string" and (...):match("(.-)[^%.]+$") or ""
+local source = ... ---@type string?
+local path = type(source) == "string" and source:match("(.-)[^%.]+$") or ""
 
 --- @class _Utils_Server: _Utils
 local UtilsServer = setmetatable({}, { __index = require(path .. "utils") })
