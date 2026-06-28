@@ -28,13 +28,13 @@
             --- @param player_id integer
             --- @return _Component_<Name>
             function Component.New(player_id)
-                return StoreAPI.SetPlayer(Store, ComponentName, player_id,
-                    { player_id = player_id }, IsNetworked)   -- value shape is yours
+                return StoreAPI.Set(Store, ComponentName, "player_"..player_id,
+                    { player_id = player_id }, IsNetworked)   -- key shape and value shape are yours
             end
 
             --- @param player_id integer
             function Component.Get(player_id)
-                return StoreAPI.GetPlayer(Store, ComponentName, player_id)
+                return StoreAPI.Get(Store, ComponentName, "player_"..player_id)
             end
 
             return Component
@@ -52,10 +52,16 @@
             PlayerData.New(player_id)
             local data = PlayerData.Get(player_id)
 
-    ── Key conventions ─────────────────────────────────────────────────────────────────
-        SetPlayer   / GetPlayer    → key "player_<id>"        per-player data
-        SetGameMode / GetGameMode  → key "gamemode"           singleton data
-        Set         / Get          → key tostring(ent_index)  per-entity data
+    ── Keys ────────────────────────────────────────────────────────────────────────────
+        The key is an arbitrary string and is yours to own — StoreAPI has no opinion about
+        it. Define the convention once inside your component and reuse it across its methods,
+        e.g. "player_"..id for per-player data, "gamemode" for a singleton, tostring(ent_index)
+        for per-entity data.
+
+        Set / Get  →  full write / read of the value at a key.
+        Patch      →  partial write: shallow-merge the given top-level keys into the stored
+                      value (rest untouched), then re-write the whole value (networked
+                      components re-push the full merged table to their NetTable).
 
     Columns are created on first write; data survives hot-reload (kept on _G._STORE).
 ]]
@@ -68,7 +74,7 @@ local StoreAPI = {}
 
 --- @param store _Store
 --- @param component_name string
---- @param ent_index int|string
+--- @param ent_index string
 --- @param value any
 --- @param is_networked bool
 function StoreAPI.Set(store, component_name, ent_index, value, is_networked)
@@ -84,19 +90,15 @@ end
 
 --- @param store _Store
 --- @param component_name string
---- @param player_id int
---- @param value any
+--- @param ent_index string
+--- @param partial table
 --- @param is_networked bool
-function StoreAPI.SetPlayer(store, component_name, player_id, value, is_networked)
-    return StoreAPI.Set(store, component_name, "player_"..player_id, value, is_networked)
-end
+function StoreAPI.Patch(store, component_name, ent_index, partial, is_networked)
+    local value = StoreAPI.Get(store, component_name, ent_index) or {}
 
---- @param store _Store
---- @param component_name string
---- @param value any
---- @param is_networked bool
-function StoreAPI.SetGameMode(store, component_name, value, is_networked)
-    return StoreAPI.Set(store, component_name, "gamemode", value, is_networked)
+    for key, field in pairs(partial) do value[key] = field end
+
+    return StoreAPI.Set(store, component_name, ent_index, value, is_networked)
 end
 
 ---- Read
@@ -104,25 +106,11 @@ end
 
 --- @param store _Store
 --- @param component_name string
---- @param ent_index int|string
+--- @param ent_index string
 function StoreAPI.Get(store, component_name, ent_index)
     local components = store[component_name]
 
     if components then return store[component_name][tostring(ent_index)] end
-end
-
---- @param store _Store
---- @param component_name string
---- @param player_id int
-function StoreAPI.GetPlayer(store, component_name, player_id)
-    return StoreAPI.Get(store, component_name, "player_"..player_id)
-
-end
-
---- @param store _Store
---- @param component_name string
-function StoreAPI.GetGameMode(store, component_name)
-    return StoreAPI.Get(store, component_name, "gamemode")
 end
 
 return StoreAPI
