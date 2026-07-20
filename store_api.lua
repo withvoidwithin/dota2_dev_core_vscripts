@@ -69,7 +69,7 @@
 --- @class _StoreAPI
 local StoreAPI = {}
 
----- Write
+---- Main
 ---- ================================================================================================================================
 
 --- @param store _Store
@@ -100,9 +100,6 @@ function StoreAPI.Patch(store, component_name, ent_index, partial, is_networked)
 
     return StoreAPI.Set(store, component_name, ent_index, value, is_networked)
 end
-
----- Read
----- ================================================================================================================================
 
 --- @param store _Store
 --- @param component_name string
